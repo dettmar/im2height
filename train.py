@@ -29,22 +29,22 @@ def run():
 		gpus=torch.cuda.device_count(),
 		num_nodes=1,
 		default_root_dir='weights/',
-		max_epochs=1000,
-		early_stop_callback=EarlyStopping(
+		max_epochs=100,
+		callbacks=[EarlyStopping(
 			monitor='val_l1loss',
 			patience=200,
 			verbose=False,
 			mode='min'
 		),
-		checkpoint_callback=ModelCheckpoint(
-			filepath='weights/best_run.ckpt',
+		ModelCheckpoint(
+			dirpath='weights/best_run.ckpt',
 			save_top_k=5,
 			verbose=True,
 			monitor='val_l1loss',
 			mode='min',
 			save_last=True
 			#prefix=''
-		)
+		)]
 	)
 
 	trainer.fit(model, train_loader, test_loader)

@@ -50,14 +50,14 @@ class NpyDataset(torch.utils.data.Dataset):
 	def __getitem__(self, idx: int) -> tuple:
 
 		img_name = os.path.join(self.x_dir, self.x_list[idx])
-		img = np.rollaxis(np.load(img_name), 0, 3)
+		img = np.rollaxis(np.load(img_name), 0, 2)
 		#print("img", img.shape)
 
 		padding = 0
 		img = np.pad(img, ((padding,padding),(padding,padding),(0,0)), "reflect") # pad to reach side of 2**n
 
 		label_name = os.path.join(self.y_dir, self.y_list[idx])
-		label = np.rollaxis(np.load(label_name), 0, 3)
+		label = np.rollaxis(np.load(label_name), 0, 2)
 		label = label-label.min()
 		#print("label", label.shape)
 
@@ -94,7 +94,7 @@ class NpyPredictionDataset(torch.utils.data.Dataset):
 
 	def __getitem__(self, idx: int) -> tuple:
 		padding = 3
-		img = np.rollaxis(np.load(self.files[idx]), 0, 3)
+		img = np.rollaxis(np.load(self.files[idx]), 0, 2)
 		img = np.pad(img, ((padding,padding),(padding,padding),(0,0)), "reflect")
 		img = torch.Tensor(img).permute((2, 0, 1))
 		return self.files[idx], img
