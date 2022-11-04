@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.utils.data import DataLoader
-from pytorch_lightning.core.lightning import LightningModule
+from pytorch_lightning.core import LightningModule
 from nadam import Nadam
 from ssim import ssim
 
@@ -130,6 +130,10 @@ class Im2Height(LightningModule):
 		y_pred = self(x)
 		l1loss = F.l1_loss(y_pred, y)
 		l2loss = F.mse_loss(y_pred, y)
+
+		self.log("l1loss", torch.tensor([l1loss]))
+		self.log("l2loss", torch.tensor([l2loss]))
+
 		tensorboard_logs = { 'l1loss': l1loss, 'l2loss': l2loss }
 
 		return { 'loss': l1loss, 'log': tensorboard_logs }
@@ -150,6 +154,10 @@ class Im2Height(LightningModule):
 		l2loss = F.mse_loss(y_pred, y)
 		ssim_loss = ssim(y_pred, y)
 
+		self.log("val_l1loss", torch.tensor([l1loss]))
+		self.log("val_l2loss", torch.tensor([l2loss]))
+		self.log("val_ssimloss", torch.tensor([ssim_loss]))
+
 		tensorboard_logs = { 'val_l1loss': l1loss, 'val_l2loss': l2loss, 'val_ssimloss': ssim_loss }
 
 		return tensorboard_logs
@@ -159,6 +167,11 @@ class Im2Height(LightningModule):
 		avg_l1loss = torch.stack([x['val_l1loss'] for x in outputs]).mean()
 		avg_l2loss = torch.stack([x['val_l2loss'] for x in outputs]).mean()
 		avg_ssimloss = torch.stack([x['val_ssimloss'] for x in outputs]).mean()
+
+		self.log("val_l1loss", torch.tensor([avg_l1loss]))
+		self.log("val_l2loss", torch.tensor([avg_l2loss]))
+		self.log("val_ssimloss", torch.tensor([avg_ssimloss]))
+
 		tensorboard_logs = { 'val_l1loss': avg_l1loss, 'val_l2loss': avg_l2loss, 'val_ssimloss': avg_ssimloss }
 
 		return { 'val_l1loss': avg_l1loss, 'log': tensorboard_logs }
